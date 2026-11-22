@@ -1,13 +1,44 @@
 
+import os
+import dj_database_url
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-l#9ie6zb4#b5z6+_r3m*_&5zw@nytb1dk1!ff)pn4r7%a8&uo%'
 
-DEBUG = True
+# --------------------------------------------------
+# SECURITY SETTINGS
+# --------------------------------------------------
 
-ALLOWED_HOSTS = []
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-local-development-only'
+)
+
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() == 'true'
+
+ALLOWED_HOSTS = [
+    h.strip()
+    for h in os.environ.get(
+        'DJANGO_ALLOWED_HOSTS',
+        '127.0.0.1,localhost'
+    ).split(',')
+    if h.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    o.strip()
+    for o in os.environ.get(
+        'DJANGO_CSRF_TRUSTED_ORIGINS',
+        ''
+    ).split(',')
+    if o.strip()
+]
+
+
+# --------------------------------------------------
+# APPLICATIONS
+# --------------------------------------------------
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -16,10 +47,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'home',
     'communities',
     'accounts',
 ]
+
+
+# --------------------------------------------------
+# MIDDLEWARE
+# --------------------------------------------------
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -31,6 +68,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+# --------------------------------------------------
+# URL AND TEMPLATE SETTINGS
+# --------------------------------------------------
 
 ROOT_URLCONF = 'communityhub.urls'
 
@@ -50,14 +92,27 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'communityhub.wsgi.application'
 
+
+# --------------------------------------------------
+# DATABASE SETTINGS
+# SQLite locally, PostgreSQL on Render
+# --------------------------------------------------
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR.as_posix()}/db.sqlite3",
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
+
+
+# --------------------------------------------------
+# PASSWORD VALIDATION
+# --------------------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -74,6 +129,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+# --------------------------------------------------
+# INTERNATIONALIZATION
+# --------------------------------------------------
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Kolkata'
@@ -82,37 +142,65 @@ USE_I18N = True
 
 USE_TZ = True
 
+
+# --------------------------------------------------
+# STATIC AND MEDIA FILES
+# --------------------------------------------------
+
 STATIC_URL = 'static/'
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = BASE_DIR / 'media'
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
+    },
+}
+
+
+# --------------------------------------------------
+# DEFAULT PRIMARY KEY
+# --------------------------------------------------
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# --------------------------------------------------
+# LOGIN SETTINGS
+# --------------------------------------------------
+
 LOGIN_URL = 'login'
+
 LOGIN_REDIRECT_URL = 'community_list'
+
 LOGOUT_REDIRECT_URL = 'login'
+
+
+# --------------------------------------------------
+# EMAIL SETTINGS
+# --------------------------------------------------
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
-# ---------------------------------------------------------------------------
-# Deployment settings. Read from environment variables; safe defaults for local use.
-# ---------------------------------------------------------------------------
-import os
-
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', SECRET_KEY)
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = [h.strip() for h in os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',') if h.strip()]
-CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()]
-
-STATIC_ROOT = BASE_DIR / 'staticfiles'      # `python manage.py collectstatic` puts files here
-MEDIA_URL = '/media/'                        # uploaded listing photos
-MEDIA_ROOT = BASE_DIR / 'media'
-STORAGES = {
-    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
-    'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage'},
-}
+# --------------------------------------------------
+# PRODUCTION SECURITY SETTINGS
+# --------------------------------------------------
 
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+    SECURE_PROXY_SSL_HEADER = (
+        'HTTP_X_FORWARDED_PROTO',
+        'https'
+    )
+
     SECURE_CONTENT_TYPE_NOSNIFF = True
