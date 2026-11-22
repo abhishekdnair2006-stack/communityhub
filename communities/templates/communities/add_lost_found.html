@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}New Lost &amp; Found post{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>New Lost &amp; Found post</h1><p>{{ community.name }}</p></div></div>
+{% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+<form class="form card" method="post">{% csrf_token %}
+  <div class="field"><label for="item_type">What happened?</label><select id="item_type" name="item_type"><option value="lost" {% if v.item_type == 'lost' %}selected{% endif %}>I lost something</option><option value="found" {% if v.item_type == 'found' %}selected{% endif %}>I found something</option></select></div>
+  <div class="field"><label for="title">Item name</label><input id="title" name="title" value="{{ v.title|default:'' }}" required></div>
+  <div class="field"><label for="description">Description</label><textarea id="description" name="description" required>{{ v.description|default:'' }}</textarea></div>
+  <div class="two"><div class="field"><label for="location">Where?</label><input id="location" name="location" value="{{ v.location|default:'' }}" required></div>
+  <div class="field"><label for="contact">Contact details</label><input id="contact" name="contact" value="{{ v.contact|default:'' }}" required></div></div>
+  <div class="row"><button class="btn" type="submit">Publish post</button><a class="btn btn-ghost" href="{% url 'lost_found_list' community.id %}">Cancel</a></div>
+</form>
+{% endblock %}

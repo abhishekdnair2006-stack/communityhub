@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+<defs>
+<linearGradient id="bg21" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E3F7F3"/><stop offset="1" stop-color="#BFEBE2"/></linearGradient>
+<linearGradient id="gl21" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity=".55"/></linearGradient>
+<linearGradient id="st21" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0B7F73"/><stop offset="1" stop-color="#0B7F73" stop-opacity=".72"/></linearGradient>
+<filter id="sh21" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#0B7F73" flood-opacity=".22"/></filter>
+</defs>
+<rect width="400" height="300" fill="url(#bg21)"/>
+<circle cx="70" cy="48" r="120" fill="#fff" opacity=".35"/>
+<circle cx="360" cy="270" r="140" fill="#BFEBE2" opacity=".7"/>
+<circle cx="340" cy="40" r="50" fill="#fff" opacity=".4"/>
+<g filter="url(#sh21)"><rect x="118" y="78" width="164" height="144" rx="38" fill="url(#gl21)" stroke="#fff" stroke-width="2"/></g>
+<g transform="translate(150 106) scale(4)" fill="none" stroke="url(#st21)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></g>
+</svg>

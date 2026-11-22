@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}{% if editing %}Edit listing{% else %}Add listing{% endif %}<script>
+(function(){var t=document.getElementById('listing_type'),u=document.getElementById('unit-field'),l=document.getElementById('price-label'),h=document.getElementById('price-hint');
+function f(){var lend=t.value==='lend';u.style.display=lend?'':'none';l.textContent=lend?'Rent amount (₹)':'Price (₹)';h.textContent=lend?'What you charge for each hour/day/week/month. 0 means free.':'The amount a buyer pays.';}
+t.addEventListener('change',f);f();})();
+</script>
+{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{% if editing %}Edit listing{% else %}Add a listing{% endif %}</h1><p>{{ community.name }}</p></div></div>
+{% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+<form class="form card" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="field"><label for="title">Item name</label><input id="title" type="text" name="title" value="{{ v.title|default:'' }}" required></div>
+  <div class="field"><label for="description">Description</label><textarea id="description" name="description" required>{{ v.description|default:'' }}</textarea></div>
+  <div class="two">
+    <div class="field"><label for="category">Category</label>
+      <select id="category" name="category" required><option value="">Choose a category</option>
+        {% for key, label in categories %}<option value="{{ key }}" {% if v.category == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+    <div class="field"><label for="listing_type">Listing type</label>
+      <select id="listing_type" name="listing_type" required>
+        {% for key, label in types %}<option value="{{ key }}" {% if v.listing_type == key %}selected{% endif %}>{% if key == 'sell' %}For sale{% else %}For lending{% endif %}</option>{% endfor %}</select></div>
+  </div>
+  <div class="two">
+    <div class="field"><label for="price" id="price-label">Price (₹)</label><input id="price" type="number" name="price" min="0" step="0.01" value="{{ v.price|default:'' }}" required>
+      <p class="hint" id="price-hint">The amount a buyer pays.</p></div>
+    <div class="field" id="unit-field"><label for="rent_unit">Rent charged</label>
+      <select id="rent_unit" name="rent_unit">{% for key, label in units %}<option value="{{ key }}" {% if v.rent_unit == key or not v.rent_unit and key == 'day' %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+      <p class="hint">Hours, days, weeks or months.</p></div>
+  </div>
+  <div class="field"><label for="image">Photo (optional)</label><input id="image" type="file" name="image" accept="image/*">
+    <p class="hint">No photo? We show a friendly illustration for the category.</p></div>
+  <div class="field"><label for="image_url">Or paste an image URL (optional)</label><input id="image_url" type="url" name="image_url" value="{{ v.image_url|default:'' }}" placeholder="https://…"></div>
+  <div class="row"><button class="btn" type="submit">{% if editing %}Save changes{% else %}Post listing{% endif %}</button>
+    <a class="btn btn-ghost" href="{% if editing %}{% url 'my_listings' %}{% else %}{% url 'marketplace' community.id %}{% endif %}">Cancel</a></div>
+</form>
+<script>
+(function(){var t=document.getElementById('listing_type'),u=document.getElementById('unit-field'),l=document.getElementById('price-label'),h=document.getElementById('price-hint');
+function f(){var lend=t.value==='lend';u.style.display=lend?'':'none';l.textContent=lend?'Rent amount (₹)':'Price (₹)';h.textContent=lend?'What you charge for each hour/day/week/month. 0 means free.':'The amount a buyer pays.';}
+t.addEventListener('change',f);f();})();
+</script>
+{% endblock %}

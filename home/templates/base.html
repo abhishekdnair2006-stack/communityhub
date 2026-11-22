@@ -1,0 +1,84 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}CommunityHub{% endblock %} · CommunityHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'home/css/icons.css' %}">
+  <link rel="stylesheet" href="{% static 'home/css/app.css' %}">
+</head>
+<body>
+<div class="orbs" aria-hidden="true"><i></i><i></i><i></i></div>
+{% with u=request.resolver_match.url_name %}
+<header class="nav" id="nav">
+  <div class="nav-in">
+    <a class="brand" href="{% if user.is_authenticated and user.is_staff %}{% url 'admin_dashboard' %}{% else %}{% url 'home' %}{% endif %}"><span class="brand-mark"><i class="ic ic-users"></i></span><span>Community<b>Hub</b></span></a>
+    <button class="icon-btn nav-toggle" type="button" aria-label="Menu"><i class="ic ic-layers"></i></button>
+
+    {% if user.is_authenticated %}
+      {% if user.is_staff %}
+        {# ---- Admin: only what an admin needs ---- #}
+        <nav class="nav-links">
+          <a href="{% url 'admin_dashboard' %}" class="{% if u == 'admin_dashboard' %}on{% endif %}"><i class="ic ic-dashboard"></i>Dashboard</a>
+          <a href="{% url 'admin_reports' %}" class="{% if u == 'admin_reports' %}on{% endif %}"><i class="ic ic-chart"></i>Reports</a>
+          <a href="{% url 'admin_communities' %}" class="{% if u == 'admin_communities' or u == 'manage_community' %}on{% endif %}"><i class="ic ic-building"></i>Communities</a>
+        </nav>
+      {% else %}
+        {# ---- Member: a short list, the rest lives in the profile menu ---- #}
+        <nav class="nav-links">
+          <a href="{% url 'shop' %}" class="{% if u == 'shop' or u == 'buy_item' or u == 'borrow_item' %}on{% endif %}"><i class="ic ic-bag"></i>Shop</a>
+          <a href="{% url 'my_communities' %}" class="{% if u == 'my_communities' or u == 'community_detail' or u == 'community_list' or u == 'marketplace' or u == 'lost_found_list' or u == 'notice_list' or u == 'manage_community' %}on{% endif %}"><i class="ic ic-users"></i>Communities</a>
+          <a href="{% url 'inbox' %}" class="{% if u == 'inbox' or u == 'chat' %}on{% endif %}"><i class="ic ic-chat"></i>Messages{% if unread_messages %}<span class="dot">{{ unread_messages }}</span>{% endif %}</a>
+        </nav>
+      {% endif %}
+
+      <div class="nav-right">
+        <a class="icon-btn" href="{% url 'notification_list' %}" aria-label="Alerts" title="Alerts"><i class="ic ic-bell"></i>{% if unread_count %}<span class="dot">{{ unread_count }}</span>{% endif %}</a>
+        <div class="menu-wrap">
+          <button class="avatar-btn" type="button" id="menu-btn" aria-haspopup="true" aria-expanded="false" aria-controls="menu" aria-label="Open profile menu">
+            <span class="avatar">{% if nav_avatar %}<img src="{{ nav_avatar }}" alt="">{% else %}{{ nav_initial }}{% endif %}</span><i class="ic ic-chevron"></i>
+          </button>
+          <div class="menu" id="menu" role="menu">
+            <div class="menu-head">
+              <span class="avatar lg">{% if nav_avatar %}<img src="{{ nav_avatar }}" alt="">{% else %}{{ nav_initial }}{% endif %}</span>
+              <div><b>{{ nav_name }}</b><span>@{{ user.username }}</span>{% if user.is_staff %}<br><span class="tag">Administrator</span>{% endif %}</div>
+            </div>
+            <a href="{% url 'profile_edit' %}" role="menuitem"><i class="ic ic-edit"></i>Edit profile &amp; photo</a>
+            {% if user.is_staff %}
+              <a href="{% url 'notification_list' %}" role="menuitem"><i class="ic ic-bell"></i>Alerts</a>
+              <a href="/admin/" role="menuitem"><i class="ic ic-settings"></i>Admin panel (advanced)</a>
+            {% else %}
+              <a href="{% url 'my_listings' %}" role="menuitem"><i class="ic ic-tag"></i>My listings</a>
+              <a href="{% url 'my_orders' %}" role="menuitem"><i class="ic ic-package"></i>My orders</a>
+              <a href="{% url 'borrow_requests' %}" role="menuitem"><i class="ic ic-repeat"></i>Borrowing</a>
+              <a href="{% url 'community_list' %}" role="menuitem"><i class="ic ic-compass"></i>Explore communities</a>
+            {% endif %}
+            <hr>
+            <a class="out" href="{% url 'logout' %}" role="menuitem"><i class="ic ic-logout"></i>Log out</a>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <nav class="nav-links">
+        <a href="{% url 'community_list' %}" class="{% if u == 'community_list' %}on{% endif %}"><i class="ic ic-compass"></i>Explore</a>
+      </nav>
+      <div class="nav-right">
+        <a class="btn btn-sm btn-ghost" href="{% url 'login' %}">Log in</a>
+        <a class="btn btn-sm" href="{% url 'register' %}">Get started</a>
+      </div>
+    {% endif %}
+  </div>
+</header>
+{% endwith %}
+
+{% if messages %}<div class="toasts">{% for m in messages %}<div class="toast {{ m.tags }}">{{ m }}</div>{% endfor %}</div>{% endif %}
+
+<main class="page">{% block content %}{% endblock %}</main>
+<footer class="footer">CommunityHub · one shared space for your campus, hostel or neighbourhood</footer>
+<script src="{% static 'home/js/app.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

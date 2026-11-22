@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}{{ community.name }}{% endblock %}
+{% block content %}
+{% include 'communities/_tabs.html' with active='home' %}
+<section class="hero-card">
+  <div class="meta"><span class="badge">{{ community.get_community_type_display }}</span><span class="badge"><i class="ic ic-pin"></i> {{ community.location }}</span><span class="badge b-approved">{{ member_count }} member{{ member_count|pluralize }}</span></div>
+  <h1>{{ community.name }}</h1>
+  <p class="muted" style="margin:0;max-width:70ch">{{ community.description }}</p>
+</section>
+<div class="grid">
+  <a class="card tile tilt" href="{% url 'marketplace' community.id %}"><div class="ico"><i class="ic ic-bag"></i></div><h3>Marketplace</h3><p>{{ listing_count }} item{{ listing_count|pluralize }} to buy or borrow.</p></a>
+  <a class="card tile tilt" href="{% url 'add_listing' community.id %}"><div class="ico"><i class="ic ic-plus"></i></div><h3>Add listing</h3><p>Sell or lend something you own.</p></a>
+  <a class="card tile tilt" href="{% url 'my_listings' %}"><div class="ico"><i class="ic ic-package"></i></div><h3>My listings</h3><p>Edit, mark as sold or delete your items.</p></a>
+  <a class="card tile tilt" href="{% url 'borrow_requests' %}"><div class="ico"><i class="ic ic-repeat"></i></div><h3>Borrow requests</h3><p>{% if incoming_count %}{{ incoming_count }} waiting for your reply.{% else %}Incoming and outgoing requests.{% endif %}</p></a>
+  <a class="card tile tilt" href="{% url 'lost_found_list' community.id %}"><div class="ico"><i class="ic ic-compass"></i></div><h3>Lost &amp; Found</h3><p>{{ open_lost_found }} open post{{ open_lost_found|pluralize }}.</p></a>
+  <a class="card tile tilt" href="{% url 'notice_list' community.id %}"><div class="ico"><i class="ic ic-pin"></i></div><h3>Noticeboard</h3><p>{{ notice_count }} notice{{ notice_count|pluralize }} from admins and neighbours.</p></a>
+  {% if can_manage %}<a class="card tile tilt" href="{% url 'manage_community' community.id %}"><div class="ico"><i class="ic ic-settings"></i></div><h3>Manage community</h3><p>Approve members, review reports and post notices.</p></a>{% endif %}
+  <a class="card tile tilt" href="{% url 'notification_list' %}"><div class="ico"><i class="ic ic-bell"></i></div><h3>Notifications</h3><p>{% if unread_count %}{{ unread_count }} unread.{% else %}You are all caught up.{% endif %}</p></a>
+</div>
+{% endblock %}

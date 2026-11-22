@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Messages{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Messages</h1><p>Ask about an item before you buy or borrow.</p></div></div>
+<div class="stack-v">
+{% for r in rows %}<a class="card flat item row-link" href="{% url 'chat' r.c.id %}"><div><b>{{ r.partner.username }}</b>{% if r.c.listing %} <span class="muted small">· {{ r.c.listing.title }}</span>{% endif %}
+  <div class="muted small">{{ r.last.body|truncatechars:70 }}</div></div>
+  <div class="row">{% if r.c.status == 'pending' %}<span class="badge b-pending">{% if r.c.other == request.user %}Wants to chat{% else %}Waiting{% endif %}</span>{% elif r.c.status == 'declined' %}<span class="badge b-rejected">Declined</span>{% endif %}{% if r.unread %}<span class="dot">{{ r.unread }}</span>{% endif %}</div></a>
+{% empty %}<div class="empty"><span class="big"><i class="ic ic-chat"></i></span><h3>No conversations yet</h3><p>Tap “Message” on any item in the shop to start one.</p><a class="btn" href="{% url 'shop' %}">Open the shop</a></div>{% endfor %}
+</div>
+{% endblock %}

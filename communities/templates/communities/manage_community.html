@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Manage {{ community.name }}{% endblock %}
+{% block content %}
+{% include 'communities/_tabs.html' with active='' %}
+<div class="page-head"><div><h1>Manage {{ community.name }}</h1><p>Approve members, review reports and keep the community tidy.</p></div>
+  <a class="btn" href="{% url 'add_notice' community.id %}">+ Post notice</a></div>
+
+<section class="card" style="margin-bottom:1.6rem"><h3>Pending join requests ({{ pending|length }})</h3>
+  {% for m in pending %}<div class="item"><span><b>{{ m.user.username }}</b> <span class="muted small">requested {{ m.joined_at|date:"d M Y" }}</span></span>
+    <form class="row" method="post" action="{% url 'decide_membership' m.id %}">{% csrf_token %}<input type="hidden" name="from" value="manage">
+      <button class="btn btn-sm btn-ok" name="action" value="approve">Approve</button><button class="btn btn-sm btn-danger" name="action" value="reject">Reject</button></form></div>
+  {% empty %}<p class="muted" style="margin:0">No pending requests.</p>{% endfor %}</section>
+
+<section class="card" style="margin-bottom:1.6rem"><h3>Open reports ({{ reports|length }})</h3>
+  {% for r in reports %}<div class="item"><div><b>{{ r.target_title }}</b> <span class="badge">{% if r.listing %}Listing{% else %}Lost &amp; found{% endif %}</span>
+    <p class="muted small" style="margin:.3rem 0 0">{{ r.reporter.username }}: {{ r.reason }}</p></div>
+    <form class="row" method="post" action="{% url 'resolve_report' r.id %}" onsubmit="return confirm('Are you sure?')">{% csrf_token %}<input type="hidden" name="from" value="manage">
+      <button class="btn btn-sm btn-ghost" name="action" value="dismiss">Dismiss</button><button class="btn btn-sm btn-danger" name="action" value="remove">Remove content</button></form></div>
+  {% empty %}<p class="muted" style="margin:0">No open reports.</p>{% endfor %}</section>
+
+<section class="card"><h3>Members ({{ approved|length }})</h3>
+  {% for m in approved %}<div class="item"><span><b>{{ m.user.username }}</b> {% if m.role == 'moderator' %}<span class="badge b-pinned">Moderator</span>{% endif %}</span>
+    <div class="row">
+      {% if user.is_staff %}<form method="post" action="{% url 'set_member_role' m.id %}">{% csrf_token %}<button class="btn btn-sm btn-ghost" name="action" value="{% if m.role == 'moderator' %}demote{% else %}promote{% endif %}">{% if m.role == 'moderator' %}Make member{% else %}Make moderator{% endif %}</button></form>{% endif %}
+      <form method="post" action="{% url 'remove_member' m.id %}" onsubmit="return confirm('Remove this member?')">{% csrf_token %}<button class="btn btn-sm btn-danger">Remove</button></form></div></div>
+  {% endfor %}</section>
+{% endblock %}

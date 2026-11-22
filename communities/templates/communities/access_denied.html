@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Access denied{% endblock %}
+{% block content %}
+<div class="auth"><div class="card" style="text-align:center;justify-items:center;display:grid">
+  <span class="big"><i class="ic ic-lock"></i></span>
+  <h2>This area is for approved members</h2>
+  <p class="muted">You need an approved membership (or admin rights for notices) to open this page. Request to join from the communities page and wait for approval.</p>
+  <a class="btn" href="{% url 'community_list' %}">Browse communities</a>
+</div></div>
+{% endblock %}

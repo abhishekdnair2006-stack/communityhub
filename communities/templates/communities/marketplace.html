@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Marketplace · {{ community.name }}{% endblock %}
+{% block content %}
+{% include 'communities/_tabs.html' with active='market' %}
+<div class="page-head">
+  <div><h1>Marketplace</h1><p>{{ community.name }}: buy, sell or borrow from people you know.</p></div>
+  <a class="btn" href="{% url 'add_listing' community.id %}">+ Add listing</a>
+</div>
+<form class="search row" method="get" style="margin-bottom:1rem">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search items in {{ community.name }}">
+  {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}{% if listing_type %}<input type="hidden" name="type" value="{{ listing_type }}">{% endif %}
+  <button class="btn" type="submit">Search</button>
+</form>
+<div class="chips">
+  <a href="?{% if listing_type %}type={{ listing_type }}{% endif %}" class="{% if not category %}on{% endif %}">All categories</a>
+  {% for key, label in categories %}<a href="?category={{ key }}{% if listing_type %}&type={{ listing_type }}{% endif %}" class="{% if category == key %}on{% endif %}">{{ label }}</a>{% endfor %}
+  <span style="width:1px;background:var(--line)"></span>
+  <a href="?{% if category %}category={{ category }}&{% endif %}type=sell" class="{% if listing_type == 'sell' %}on{% endif %}">For sale</a>
+  <a href="?{% if category %}category={{ category }}&{% endif %}type=lend" class="{% if listing_type == 'lend' %}on{% endif %}">For lending</a>
+</div>
+<div class="products">
+{% for item in listings %}{% include 'communities/_product_card.html' %}
+{% empty %}
+  <div class="empty"><span class="big"><i class="ic ic-bag"></i></span><h3>Nothing here yet</h3><p>Be the first to list a book, a calculator or anything others might need.</p><a class="btn" href="{% url 'add_listing' community.id %}">Add the first listing</a></div>
+{% endfor %}
+</div>
+{% if page.has_other_pages %}<div class="pager">
+  {% if page.has_previous %}<a class="btn btn-sm btn-ghost" href="?page={{ page.previous_page_number }}&q={{ q }}&category={{ category }}&type={{ listing_type }}">Previous</a>{% endif %}
+  <span class="muted small">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a class="btn btn-sm btn-ghost" href="?page={{ page.next_page_number }}&q={{ q }}&category={{ category }}&type={{ listing_type }}">Next</a>{% endif %}
+</div>{% endif %}
+{% endblock %}

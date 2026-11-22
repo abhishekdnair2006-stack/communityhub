@@ -1,0 +1,7 @@
+<nav class="tabs">
+  <a href="{% url 'community_detail' community.id %}" class="{% if active == 'home' %}on{% endif %}">Dashboard</a>
+  <a href="{% url 'marketplace' community.id %}" class="{% if active == 'market' %}on{% endif %}">Marketplace</a>
+  <a href="{% url 'shop' %}">All items</a>
+  <a href="{% url 'lost_found_list' community.id %}" class="{% if active == 'lost' %}on{% endif %}">Lost &amp; Found</a>
+  <a href="{% url 'notice_list' community.id %}" class="{% if active == 'notice' %}on{% endif %}">Noticeboard</a>
+</nav>

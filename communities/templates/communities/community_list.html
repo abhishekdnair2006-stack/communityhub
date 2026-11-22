@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Explore communities{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Find your community</h1><p>Search by name or location, then request to join. An admin approves new members.</p></div>
+  {% if user.is_authenticated %}<a class="btn btn-ghost" href="{% url 'request_community' %}">Can't find yours? Request it</a>{% endif %}
+</div>
+<form class="search row" method="get" style="margin-bottom:1.8rem">
+  <input type="text" name="search" value="{{ search }}" placeholder="Search by name or location">
+  <button class="btn" type="submit">Search</button>
+</form>
+<div class="grid">
+{% for c in communities %}
+  <article class="card tilt">
+    <img class="cover" src="{{ c.cover_url }}" alt="">
+    <div class="meta" style="margin-bottom:.8rem"><span class="badge">{{ c.get_community_type_display }}</span>
+      {% if c.my_status %}<span class="badge b-{{ c.my_status }}">{{ c.my_status|capfirst }}</span>{% endif %}</div>
+    <h3>{{ c.name }}</h3>
+    <p class="muted small"><i class="ic ic-pin"></i> {{ c.location }}</p>
+    <p class="muted">{{ c.description|truncatechars:110 }}</p>
+    {% if c.my_status == 'approved' %}
+      <a class="btn btn-sm" href="{% url 'community_detail' c.id %}">Open dashboard</a>
+    {% elif c.my_status == 'pending' %}
+      <span class="muted small">Waiting for admin approval</span>
+    {% elif c.my_status == 'rejected' %}
+      <span class="muted small">Request rejected. Contact the admin.</span>
+    {% elif user.is_authenticated %}
+      <form method="post" action="{% url 'join_community' c.id %}">{% csrf_token %}<button class="btn btn-sm" type="submit">Request to join</button></form>
+    {% else %}
+      <a class="btn btn-sm btn-ghost" href="{% url 'login' %}?next={{ request.path }}">Log in to join</a>
+    {% endif %}
+  </article>
+{% empty %}
+  <div class="empty"><span class="big"><i class="ic ic-search"></i></span><h3>No communities found</h3>
+    <p>{% if search %}Nothing matches “{{ search }}”. Try another name or location.{% else %}No communities exist yet. An admin can create one from the admin panel.{% endif %}</p></div>
+{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Chat with {{ partner.username }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ partner.username }}</h1><p>{% if convo.listing %}About: <b>{{ convo.listing.title }}</b>{% else %}Direct chat{% endif %}</p></div><a class="btn btn-ghost btn-sm" href="{% url 'inbox' %}">← All messages</a></div>
+<div class="chatbox card">
+  <div class="bubbles" id="bubbles">
+  {% for m in chat_messages %}<div class="bubble {% if m.sender == request.user %}me{% endif %}"><span>{{ m.body|linebreaksbr }}</span><small>{{ m.created_at|date:"d M, H:i" }}</small></div>{% endfor %}
+  </div>
+  {% if convo.status == 'pending' %}
+    {% if is_receiver %}
+      <div class="alert ok" style="margin:1rem 0 0">{{ partner.username }} wants to chat. Accept to reply.</div>
+      <form class="row" method="post" style="margin-top:.8rem">{% csrf_token %}<button class="btn btn-ok" name="action" value="accept">Accept</button><button class="btn btn-danger" name="action" value="decline">Decline</button></form>
+    {% else %}<p class="muted" style="margin:1rem 0 0">Waiting for {{ partner.username }} to accept your request.</p>{% endif %}
+  {% elif convo.status == 'declined' %}<p class="muted" style="margin:1rem 0 0">This chat was declined.</p>
+  {% else %}
+    {% if wa_link %}<div class="alert ok" style="margin:1rem 0 0">{{ partner.username }} shared their WhatsApp. <a href="{{ wa_link }}" target="_blank" rel="noopener"><u>Open WhatsApp</u></a></div>{% endif %}
+    <form class="composer" method="post">{% csrf_token %}<input type="hidden" name="action" value="send">
+      <input name="body" placeholder="Type a message…" maxlength="1000" required autocomplete="off"><button class="btn" type="submit">Send</button></form>
+    <form method="post" class="row" style="margin-top:.8rem">{% csrf_token %}
+      {% if i_shared %}<span class="muted small">Your WhatsApp number is visible to {{ partner.username }}.</span><button class="btn btn-sm btn-ghost" name="action" value="unshare">Hide it</button>
+      {% else %}<button class="btn btn-sm btn-ghost" name="action" value="share">Share my WhatsApp number</button>{% endif %}</form>
+  {% endif %}
+</div>
+<script>var b=document.getElementById('bubbles');if(b)b.scrollTop=b.scrollHeight;</script>
+{% endblock %}

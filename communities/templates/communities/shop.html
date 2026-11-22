@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Shop{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>What's on in your communities</h1><p>Buy, rent or borrow from people you already share a campus, hostel or street with.</p></div>
+  <div class="row"><a class="btn btn-ghost" href="{% url 'my_orders' %}">My orders</a><a class="btn" href="{% url 'my_communities' %}">+ Sell or lend</a></div></div>
+{% if not has_communities %}
+<div class="empty"><span class="big"><i class="ic ic-home"></i></span><h3>Join a community to see items</h3><p>Items are only shown to approved members of the same community.</p><a class="btn" href="{% url 'community_list' %}">Find a community</a></div>
+{% else %}
+<form class="filters" method="get">
+  <div class="f-main">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search calculators, books, bikes…">
+    <select name="community"><option value="all">All my communities</option>{% for m in communities %}<option value="{{ m.community.id }}" {% if selected == m.community.id|stringformat:'s' %}selected{% endif %}>{{ m.community.name }}</option>{% endfor %}</select>
+    <button class="btn" type="submit">Search</button>
+  </div>
+  <div class="f-row">
+    <select name="category"><option value="">Any category</option>{% for k, l in categories %}<option value="{{ k }}" {% if category == k %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+    <select name="type"><option value="">Buy &amp; rent</option><option value="sell" {% if kind == 'sell' %}selected{% endif %}>To buy</option><option value="lend" {% if kind == 'lend' %}selected{% endif %}>To rent / borrow</option></select>
+    <select name="unit"><option value="">Any rental period</option>{% for k, l in units %}<option value="{{ k }}" {% if unit == k %}selected{% endif %}>Rent {{ l }}</option>{% endfor %}</select>
+    <input type="number" name="max" min="0" placeholder="Max ₹" value="{{ max_price }}">
+    <select name="sort"><option value="new">Newest</option><option value="low" {% if sort == 'low' %}selected{% endif %}>Price: low to high</option><option value="high" {% if sort == 'high' %}selected{% endif %}>Price: high to low</option></select>
+    <a class="btn btn-ghost btn-sm" href="{% url 'shop' %}">Reset</a>
+  </div>
+</form>
+<div class="chips">{% for k, l in categories %}<a href="?category={{ k }}&community={{ selected }}" class="{% if category == k %}on{% endif %}">{{ l }}</a>{% endfor %}</div>
+<div class="products">
+  {% for item in listings %}{% include 'communities/_product_card.html' with show_community=True %}
+  {% empty %}<div class="empty"><span class="big"><i class="ic ic-bag"></i></span><h3>No items match</h3><p>Try fewer filters, or list something yourself.</p></div>{% endfor %}
+</div>
+{% if page.has_other_pages %}<div class="pager">
+  {% if page.has_previous %}<a class="btn btn-sm btn-ghost" href="?{{ qs }}&page={{ page.previous_page_number }}">Previous</a>{% endif %}
+  <span class="muted small">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a class="btn btn-sm btn-ghost" href="?{{ qs }}&page={{ page.next_page_number }}">Next</a>{% endif %}</div>{% endif %}
+{% endif %}
+{% endblock %}

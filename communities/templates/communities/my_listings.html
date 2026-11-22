@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}My listings{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>My listings</h1><p>Everything you have posted. Sold items stay here but are hidden from the marketplace.</p></div></div>
+<div class="grid">
+{% for item in listings %}
+  <article class="card">
+    <div class="thumb" style="height:130px"><img src="{{ item.picture_url }}" alt=""></div>
+    <div class="meta" style="margin-bottom:.6rem"><span class="badge b-{{ item.listing_type }}">{{ item.get_listing_type_display }}</span>
+      <span class="badge b-{{ item.status }}">{{ item.get_status_display }}</span><span class="badge">{{ item.community.name }}</span></div>
+    <h3>{{ item.title }}</h3>
+    <p class="muted small">{{ item.description|truncatechars:80 }}</p>
+    <div class="price">₹{{ item.price }}</div>
+    <div class="row" style="margin-top:.9rem">
+      <a class="btn btn-sm btn-ghost" href="{% url 'edit_listing' item.id %}">Edit</a>
+      <form method="post" action="{% url 'set_listing_status' item.id %}">{% csrf_token %}
+        {% if item.status == 'available' %}<button class="btn btn-sm btn-ok" name="action" value="sold">Mark sold</button>
+        {% elif item.status == 'sold' %}<button class="btn btn-sm btn-ok" name="action" value="available">Make available</button>
+        {% else %}<span class="muted small">Lent out. Mark returned in Borrowing.</span>{% endif %}</form>
+      <form method="post" action="{% url 'delete_listing' item.id %}" onsubmit="return confirm('Delete this listing permanently?')">{% csrf_token %}<button class="btn btn-sm btn-danger">Delete</button></form>
+    </div>
+  </article>
+{% empty %}
+  <div class="empty"><span class="big"><i class="ic ic-package"></i></span><h3>You have not posted anything</h3><p>Open one of your communities and add your first listing.</p><a class="btn" href="{% url 'community_list' %}">Go to communities</a></div>
+{% endfor %}
+</div>
+{% endblock %}

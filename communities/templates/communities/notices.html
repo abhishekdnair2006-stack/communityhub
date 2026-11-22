@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Noticeboard · {{ community.name }}{% endblock %}
+{% block content %}
+{% include 'communities/_tabs.html' with active='notice' %}
+<div class="page-head"><div><h1>Noticeboard</h1><p>{{ community.name }}: announcements from admins, and issues, help requests and notes from neighbours.</p></div>
+  {% if can_post %}<a class="btn" href="{% url 'add_notice' community.id %}">+ {% if can_manage %}Post notice{% else %}Post an issue or note{% endif %}</a>{% endif %}</div>
+<div class="stack-v">
+{% for n in notices %}
+  <article class="card {% if n.is_pinned %}pin{% endif %}">
+    <div class="meta" style="margin-bottom:.6rem">{% if n.is_pinned %}<span class="badge b-pinned"><i class="ic ic-pin"></i> Pinned</span>{% endif %}<span class="badge b-{{ n.notice_type }}">{{ n.get_notice_type_display }}</span></div>
+    <h2>{{ n.title }}</h2><p>{{ n.content|linebreaksbr }}</p>
+    <p class="muted small" style="margin:0">{{ n.created_by.username }} · {{ n.created_at|date:"d M Y, H:i" }}</p>
+    {% if can_manage or n.created_by == request.user %}<form class="row" style="margin-top:.8rem" method="post" action="{% url 'notice_action' n.id %}" onsubmit="return confirm('Are you sure?')">{% csrf_token %}
+      {% if can_manage %}<button class="btn btn-sm btn-ghost" name="action" value="{% if n.is_pinned %}unpin{% else %}pin{% endif %}">{% if n.is_pinned %}Unpin{% else %}Pin{% endif %}</button>{% endif %}
+      <button class="btn btn-sm btn-danger" name="action" value="delete">Delete</button></form>{% endif %}
+  </article>
+{% empty %}<div class="empty"><span class="big"><i class="ic ic-pin"></i></span><h3>No notices yet</h3><p>Announcements from the community admins will appear here.</p></div>{% endfor %}
+</div>
+{% endblock %}

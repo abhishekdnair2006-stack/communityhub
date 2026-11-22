@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+<defs>
+<linearGradient id="bg18" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EEF2F7"/><stop offset="1" stop-color="#D6DEEA"/></linearGradient>
+<linearGradient id="gl18" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity=".55"/></linearGradient>
+<linearGradient id="st18" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3F5878"/><stop offset="1" stop-color="#3F5878" stop-opacity=".72"/></linearGradient>
+<filter id="sh18" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#3F5878" flood-opacity=".22"/></filter>
+</defs>
+<rect width="400" height="300" fill="url(#bg18)"/>
+<circle cx="70" cy="48" r="120" fill="#fff" opacity=".35"/>
+<circle cx="360" cy="270" r="140" fill="#D6DEEA" opacity=".7"/>
+<circle cx="340" cy="40" r="50" fill="#fff" opacity=".4"/>
+<g filter="url(#sh18)"><rect x="118" y="78" width="164" height="144" rx="38" fill="url(#gl18)" stroke="#fff" stroke-width="2"/></g>
+<g transform="translate(150 106) scale(4)" fill="none" stroke="url(#st18)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></g>
+</svg>

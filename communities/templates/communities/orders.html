@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}My orders{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>My orders</h1><p>What you bought and what people want to buy from you.</p></div></div>
+<h2>Selling</h2><div class="stack-v" style="margin-bottom:2rem">
+{% for o in sold %}<a class="card flat item row-link" href="{% url 'order_detail' o.id %}"><div><b>{{ o.listing.title }}</b><div class="muted small">{{ o.buyer.username }} · ₹{{ o.amount }}</div></div><span class="badge b-{{ o.status }}">{{ o.get_status_display }}</span></a>
+{% empty %}<p class="muted">No one has ordered your items yet.</p>{% endfor %}</div>
+<h2>Buying</h2><div class="stack-v">
+{% for o in bought %}<a class="card flat item row-link" href="{% url 'order_detail' o.id %}"><div><b>{{ o.listing.title }}</b><div class="muted small">{{ o.listing.seller.username }} · ₹{{ o.amount }}</div></div><span class="badge b-{{ o.status }}">{{ o.get_status_display }}</span></a>
+{% empty %}<p class="muted">You have not bought anything yet. <a href="{% url 'shop' %}"><u>Browse the shop</u></a></p>{% endfor %}</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Join request{% endblock %}
+{% block content %}
+<div class="auth"><div class="card" style="text-align:center;justify-items:center;display:grid">
+  <span class="big">{% if status == 'approved' %}<i class="ic ic-check"></i>{% elif status == 'rejected' %}<i class="ic ic-x"></i>{% else %}<i class="ic ic-clock"></i>{% endif %}</span>
+  <h2>{{ community.name }}</h2>
+  <p class="muted">{{ message }}</p>
+  <span class="badge b-{{ status }}">{{ status|capfirst }}</span>
+  <div class="row" style="justify-content:center;margin-top:1.4rem">
+    {% if status == 'approved' %}<a class="btn" href="{% url 'community_detail' community.id %}">Open dashboard</a>{% endif %}
+    <a class="btn btn-ghost" href="{% url 'community_list' %}">Back to communities</a>
+  </div>
+</div></div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Request a community{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Request a new community</h1><p>Can't find your college, hostel or neighbourhood? Tell the admins. If approved, you become its first moderator.</p></div></div>
+{% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+<form class="form card" method="post">{% csrf_token %}
+  <div class="field"><label for="name">Community name</label><input id="name" name="name" value="{{ v.name|default:'' }}" placeholder="e.g. Hill View Colony" required></div>
+  <div class="two"><div class="field"><label for="community_type">Type</label><select id="community_type" name="community_type">{% for key, label in types %}<option value="{{ key }}" {% if v.community_type == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <div class="field"><label for="location">Location</label><input id="location" name="location" value="{{ v.location|default:'' }}" placeholder="Town, district" required></div></div>
+  <div class="field"><label for="description">Why does this community need a space?</label><textarea id="description" name="description" required>{{ v.description|default:'' }}</textarea></div>
+  <div class="row"><button class="btn" type="submit">Send request</button><a class="btn btn-ghost" href="{% url 'community_list' %}">Cancel</a></div>
+</form>
+{% endblock %}

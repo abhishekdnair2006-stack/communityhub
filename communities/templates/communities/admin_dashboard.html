@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Admin dashboard{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Welcome back, {{ nav_name }}</h1><p>Here is what needs your attention today.</p></div>
+  <div class="row">
+    <a class="btn btn-ghost" href="{% url 'export_memberships_csv' %}"><i class="ic ic-download"></i>Export members</a>
+    <a class="btn" href="/admin/communities/community/add/"><i class="ic ic-plus"></i>New community</a>
+  </div>
+</div>
+
+<div class="kpis">{% for label, value, colour, icon in kpis %}
+  <div class="kpi {{ colour }}"><span class="ico"><i class="ic ic-{{ icon }}"></i></span><b>{{ value }}</b><span>{{ label }}</span></div>{% endfor %}
+</div>
+
+<div class="charts wide">
+  <section class="card">
+    <div class="row" style="justify-content:space-between"><div><h3>Growth, last 14 days</h3><p class="sub" style="margin:0 0 .6rem">New users and new listings</p></div>
+      <a class="btn btn-sm btn-ghost" href="{% url 'admin_reports' %}">Full reports <i class="ic ic-arrow"></i></a></div>
+    <div class="chart" id="growth"></div>
+  </section>
+  <section class="card">
+    <h3>Latest activity</h3><p class="sub">Newest listings and lost &amp; found posts</p>
+    {% for l in recent_listings %}<div class="item" style="margin-bottom:.65rem"><div><b>{{ l.title }}</b><br><span class="muted small">{{ l.seller.username }} · {{ l.community.name }}</span></div><span class="badge b-{{ l.listing_type }}">{{ l.get_listing_type_display }}</span></div>
+    {% empty %}<p class="muted">No listings yet.</p>{% endfor %}
+    {% for i in recent_lost %}<div class="item" style="margin-bottom:.65rem"><div><b>{{ i.title }}</b><br><span class="muted small">{{ i.community.name }} · {{ i.get_status_display }}</span></div><span class="badge b-{{ i.item_type }}">{{ i.get_item_type_display }}</span></div>{% endfor %}
+  </section>
+</div>
+
+<div class="section-title"><h2>Needs your attention</h2></div>
+
+<section class="card" style="margin-bottom:1.2rem">
+  <h3>Membership requests<span class="queue-n {% if not n_pending %}zero{% endif %}">{{ n_pending }}</span></h3>
+  <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>User</th><th>Community</th><th>Requested</th><th></th></tr></thead><tbody>
+  {% for m in pending %}<tr><td><b>{{ m.user.username }}</b></td><td>{{ m.community.name }}</td><td>{{ m.joined_at|date:"d M Y" }}</td>
+    <td><form class="row" style="justify-content:flex-end" method="post" action="{% url 'decide_membership' m.id %}">{% csrf_token %}
+      <button class="btn btn-sm btn-ok" name="action" value="approve">Approve</button><button class="btn btn-sm btn-danger" name="action" value="reject">Reject</button></form></td></tr>
+  {% empty %}<tr><td colspan="4" class="muted">All caught up. No pending requests.</td></tr>{% endfor %}</tbody></table></div>
+  {% if n_pending > 8 %}<p class="muted small" style="margin:.8rem 0 0">Showing the oldest 8 of {{ n_pending }}.</p>{% endif %}
+</section>
+
+<div class="charts">
+  <section class="card"><h3>New community requests<span class="queue-n {% if not n_requests %}zero{% endif %}">{{ n_requests }}</span></h3>
+    {% for r in community_requests %}<div class="item" style="padding:.6rem 0;border-top:1px solid var(--line)"><div><b>{{ r.name }}</b> <span class="badge">{{ r.get_community_type_display }}</span><p class="muted small" style="margin:.2rem 0 0">{{ r.location }} · by {{ r.user.username }}<br>{{ r.description|truncatechars:90 }}</p></div>
+      <form class="row" method="post" action="{% url 'decide_community_request' r.id %}">{% csrf_token %}<button class="btn btn-sm btn-ok" name="action" value="approve">Create</button><button class="btn btn-sm btn-danger" name="action" value="reject">Reject</button></form></div>
+    {% empty %}<p class="muted" style="margin:0">No requests right now.</p>{% endfor %}</section>
+  <section class="card"><h3>Open reports<span class="queue-n {% if not n_reports %}zero{% endif %}">{{ n_reports }}</span></h3>
+    {% for r in open_reports %}<div class="item" style="padding:.6rem 0;border-top:1px solid var(--line)"><div><b>{{ r.target_title }}</b> <span class="muted small">in {{ r.community.name }}</span><p class="muted small" style="margin:.2rem 0 0">{{ r.reporter.username }}: {{ r.reason|truncatechars:80 }}</p></div>
+      <form class="row" method="post" action="{% url 'resolve_report' r.id %}" onsubmit="return confirm('Are you sure?')">{% csrf_token %}<button class="btn btn-sm btn-ghost" name="action" value="dismiss">Dismiss</button><button class="btn btn-sm btn-danger" name="action" value="remove">Remove</button></form></div>
+    {% empty %}<p class="muted" style="margin:0">No open reports.</p>{% endfor %}</section>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ growth|json_script:"growth-data" }}
+<script src="{% static 'home/js/charts.js' %}"></script>
+<script>
+(function(){
+  var g = HubCharts.data('growth-data'), host = document.getElementById('growth');
+  function draw(){ HubCharts.line(host, {labels: g.labels, series: g.series, height: 290, label: 'New users and listings per day'}); }
+  draw(); var t; window.addEventListener('resize', function(){ clearTimeout(t); t = setTimeout(draw, 150); });
+})();
+</script>
+{% endblock %}

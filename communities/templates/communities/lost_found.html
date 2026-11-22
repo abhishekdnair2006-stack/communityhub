@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Lost &amp; Found · {{ community.name }}{% endblock %}
+{% block content %}
+{% include 'communities/_tabs.html' with active='lost' %}
+<div class="page-head"><div><h1>Lost &amp; Found</h1><p>{{ community.name }}: help belongings find their way home.</p></div>
+  <a class="btn" href="{% url 'add_lost_found' community.id %}">+ New post</a></div>
+<div class="chips"><a href="?" class="{% if not kind %}on{% endif %}">All</a><a href="?type=lost" class="{% if kind == 'lost' %}on{% endif %}">Lost</a><a href="?type=found" class="{% if kind == 'found' %}on{% endif %}">Found</a></div>
+<div class="grid">
+{% for item in items %}
+  <article class="card" {% if item.status == 'resolved' %}style="opacity:.6"{% endif %}>
+    <div class="meta" style="margin-bottom:.6rem"><span class="badge b-{{ item.item_type }}">{{ item.get_item_type_display }}</span><span class="badge b-{{ item.status }}">{{ item.get_status_display }}</span></div>
+    <h3>{{ item.title }}</h3>
+    <p class="muted">{{ item.description }}</p>
+    <p class="small" style="margin:0"><i class="ic ic-pin"></i> {{ item.location }}</p>
+    <p class="small" style="margin:.2rem 0 .8rem"><i class="ic ic-phone2"></i> {{ item.contact }}</p>
+    <p class="muted small">Posted by {{ item.user.username }} · {{ item.created_at|date:"d M Y" }}</p>
+    {% if item.status == 'open' and item.user == request.user or item.status == 'open' and can_manage %}
+      <form method="post" action="{% url 'resolve_lost_found' item.id %}">{% csrf_token %}<button class="btn btn-sm btn-ok">Mark resolved</button></form>{% endif %}
+    {% if item.user != request.user %}<details class="report"><summary>Report</summary>
+      <form method="post" action="{% url 'report_content' 'lost' item.id %}">{% csrf_token %}
+        <textarea name="reason" placeholder="Why are you reporting this post?" required></textarea><button class="btn btn-sm btn-danger">Send report</button></form></details>{% endif %}
+  </article>
+{% empty %}<div class="empty"><span class="big"><i class="ic ic-compass"></i></span><h3>Nothing reported</h3><p>Lost something or found something? Post it so others can help.</p><a class="btn" href="{% url 'add_lost_found' community.id %}">Create a post</a></div>{% endfor %}
+</div>
+{% endblock %}

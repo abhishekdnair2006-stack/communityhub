@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Your community, in one place{% endblock %}
+{% block content %}
+<section class="hero-panel">
+  <div class="hero-copy">
+    <span class="pill"><i class="ic ic-shield"></i>Trusted by campuses, hostels &amp; streets</span>
+    <h1>Share more.<br><em>Spend less.</em><br>Know your neighbours.</h1>
+    <p class="lead">Buy a second-hand calculator, rent a bicycle by the day, report a lost wallet and read the notice that matters, all inside your own approved community.</p>
+    <div class="row">
+      {% if user.is_authenticated %}<a class="btn btn-lg" href="{% url 'shop' %}">Open the shop <span class="dotarrow"><i class="ic ic-arrow"></i></span></a>
+      {% else %}<a class="btn btn-lg" href="{% url 'register' %}">Create account <span class="dotarrow"><i class="ic ic-arrow"></i></span></a><a class="btn btn-lg btn-ghost" href="{% url 'community_list' %}">Browse communities</a>{% endif %}
+    </div>
+    {% if my_communities %}<div class="row jump"><span class="muted small">Jump back in:</span>{% for m in my_communities %}<a class="btn btn-sm btn-ghost" href="{% url 'community_detail' m.community.id %}">{{ m.community.name }}</a>{% endfor %}</div>{% endif %}
+  </div>
+
+  {# 3D scene: a spinning glass cube, orbit rings and floating product cards. Move the mouse over it. #}
+  <div class="scene" aria-hidden="true">
+    <div class="stack3d">
+      <div class="ring"></div><div class="ring r2"></div>
+      <div class="cube">
+        <div class="face f1"><i class="ic ic-bag"></i></div><div class="face f2"><i class="ic ic-chat"></i></div>
+        <div class="face f3"><i class="ic ic-tag"></i></div><div class="face f4"><i class="ic ic-compass"></i></div>
+        <div class="face f5"><i class="ic ic-shield"></i></div><div class="face f6"><i class="ic ic-repeat"></i></div>
+      </div>
+      <div class="mcard m1"><img src="{% static 'home/img/p-calculator.svg' %}" alt=""><b>Scientific calculator</b><span>₹20 / day · Hostel B</span></div>
+      <div class="mcard m2"><img src="{% static 'home/img/p-bicycle.svg' %}" alt=""><b>City bicycle</b><span>₹1,800 · Thodupuzha</span></div>
+      <div class="mcard m3"><img src="{% static 'home/img/p-headphones.svg' %}" alt=""><b>Headphones</b><span>₹50 / week</span></div>
+      <div class="mcard m4"><img src="{% static 'home/img/p-wallet.svg' %}" alt=""><b>Lost: brown wallet</b><span>Near the library</span></div>
+      <span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span>
+    </div>
+  </div>
+</section>
+
+<section class="sec stats">
+  <div><i class="ic ic-lock"></i><b>Private</b><span>Only approved members see items</span></div>
+  <div><i class="ic ic-phone2"></i><b>Direct</b><span>Pay sellers by UPI, no middleman</span></div>
+  <div><i class="ic ic-clock"></i><b>Flexible</b><span>Rent by the hour, day, week or month</span></div>
+  <div><i class="ic ic-pin"></i><b>Local</b><span>Your campus, hostel or street only</span></div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><h2>Everything a small community needs</h2></div>
+  <div class="feature-grid">
+    <div class="card tile"><div class="ico"><i class="ic ic-bag"></i></div><h3>Buy &amp; sell</h3><p>List books, gadgets and furniture. Checkout with a UPI QR code.</p></div>
+    <div class="card tile"><div class="ico"><i class="ic ic-clock"></i></div><h3>Rent &amp; borrow</h3><p>Lend what you rarely use and set a price per hour, day, week or month.</p></div>
+    <div class="card tile"><div class="ico"><i class="ic ic-chat"></i></div><h3>Private chat</h3><p>Ask questions inside the app. Share WhatsApp only when you accept.</p></div>
+    <div class="card tile"><div class="ico"><i class="ic ic-compass"></i></div><h3>Lost &amp; found</h3><p>One board for wallets, keys and phones.</p></div>
+    <div class="card tile"><div class="ico"><i class="ic ic-pin"></i></div><h3>Noticeboard</h3><p>Admin announcements, plus neighbours raising issues and asking for help.</p></div>
+    <div class="card tile"><div class="ico"><i class="ic ic-shield"></i></div><h3>Moderated</h3><p>Admins and moderators approve members and review reports.</p></div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><h2>How it works</h2></div>
+  <div class="steps">
+    <div class="card"><h3>Create an account</h3><p class="muted">Register and add your UPI ID and phone number if you want to sell.</p></div>
+    <div class="card"><h3>Join your community</h3><p class="muted">Request to join your college, hostel or neighbourhood. An admin or moderator approves you.</p></div>
+    <div class="card"><h3>Start sharing</h3><p class="muted">Browse the shop, list your own items, chat, and use the noticeboard.</p></div>
+  </div>
+</section>
+{% endblock %}

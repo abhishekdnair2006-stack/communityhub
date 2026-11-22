@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Borrow requests{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Borrowing</h1><p>Reply to people who want your items, and track what you asked to borrow.</p></div></div>
+<div class="seg"><button type="button" data-tab="in">Incoming ({{ requests|length }})</button><button type="button" data-tab="out">My requests ({{ my_requests|length }})</button></div>
+
+<section data-pane="in" class="stack-v">
+{% for item in requests %}
+  <article class="card item">
+    <div><div class="meta" style="margin-bottom:.4rem"><span class="badge b-{{ item.status }}">{{ item.get_status_display }}</span><span class="badge">{{ item.listing.community.name }}</span></div>
+      <h3>{{ item.listing.title }}</h3>
+      <p class="muted small" style="margin:0">{{ item.borrower.username }} wants it for {{ item.units }} {{ item.listing.rent_unit }}{{ item.units|pluralize }}, until <b>{{ item.return_date|date:"d M Y" }}</b> · rent ₹{{ item.total_rent }}</p>
+      <p class="muted" style="margin:.4rem 0 0">“{{ item.message|default:"No message." }}”</p></div>
+    {% if item.status == 'pending' or item.status == 'approved' %}
+    <form class="row" method="post" action="{% url 'update_borrow_request' item.id %}">{% csrf_token %}
+      {% if item.status == 'pending' %}<button class="btn btn-sm btn-ok" name="action" value="approve">Approve</button><button class="btn btn-sm btn-danger" name="action" value="reject">Reject</button>
+      {% else %}<button class="btn btn-sm" name="action" value="return">Mark returned</button>{% endif %}
+    </form>{% endif %}
+  </article>
+{% empty %}<div class="empty"><span class="big"><i class="ic ic-inbox"></i></span><h3>No incoming requests</h3><p>When someone asks to borrow one of your items, it shows up here.</p></div>{% endfor %}
+</section>
+
+<section data-pane="out" class="stack-v">
+{% for item in my_requests %}
+  <article class="card item">
+    <div><div class="meta" style="margin-bottom:.4rem"><span class="badge b-{{ item.status }}">{{ item.get_status_display }}</span><span class="badge">{{ item.listing.community.name }}</span></div>
+      <h3>{{ item.listing.title }}</h3>
+      <p class="muted small" style="margin:0">Owner: {{ item.listing.seller.username }} · {{ item.units }} {{ item.listing.rent_unit }}{{ item.units|pluralize }} · rent ₹{{ item.total_rent }} · return by {{ item.return_date|date:"d M Y" }}</p></div>
+  </article>
+{% empty %}<div class="empty"><span class="big"><i class="ic ic-repeat"></i></span><h3>You have not requested anything</h3><p>Find lendable items in your community marketplace.</p><a class="btn" href="{% url 'community_list' %}">Browse communities</a></div>{% endfor %}
+</section>
+{% endblock %}

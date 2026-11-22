@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Notifications</h1><p>Requests, approvals and new notices.</p></div>
+  {% if unread_count %}<form method="post" action="{% url 'mark_all_notifications_read' %}">{% csrf_token %}<button class="btn btn-ghost">Mark all as read</button></form>{% endif %}</div>
+<div>
+{% for n in notifications %}
+  <article class="card flat item {% if not n.is_read %}unread{% endif %}">
+    <div><p style="margin:0">{% if n.link %}<a href="{{ n.link }}" style="color:var(--aqua);font-weight:600">{{ n.message }}</a>{% else %}{{ n.message }}{% endif %}</p><span class="muted small">{{ n.created_at|timesince }} ago</span></div>
+    {% if not n.is_read %}<form method="post" action="{% url 'mark_notification_read' n.id %}">{% csrf_token %}<button class="btn btn-sm btn-ghost">Mark as read</button></form>{% endif %}
+  </article>
+{% empty %}<div class="empty"><span class="big"><i class="ic ic-bell"></i></span><h3>You are all caught up</h3><p>New activity will show up here.</p></div>{% endfor %}
+</div>
+{% endblock %}

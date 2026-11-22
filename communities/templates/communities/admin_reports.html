@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Reports</h1><p>How the platform is growing and being used. Updated {{ generated|date:"d M Y, H:i" }}.</p></div>
+  <div class="row no-print">
+    <div class="range">{% for d in ranges %}<a href="?days={{ d }}" class="{% if d == span %}on{% endif %}">{{ d }} days</a>{% endfor %}</div>
+    <a class="btn btn-ghost" href="{% url 'export_memberships_csv' %}"><i class="ic ic-download"></i>Members CSV</a>
+    <button class="btn btn-ghost" type="button" onclick="window.print()"><i class="ic ic-external"></i>Print / PDF</button>
+  </div>
+</div>
+
+<div class="kpis">{% for k in kpis %}
+  <div class="kpi {{ k.colour }}"><span class="ico"><i class="ic ic-{{ k.icon }}"></i></span><b>{{ k.value }}</b><span>{{ k.label }}</span>
+    <div class="muted small" style="margin-top:.2rem">{{ k.sub }}</div>
+    {% if k.change != None %}<small class="{% if k.change < 0 %}down{% elif k.change == 0 %}flat{% endif %}"><i class="ic ic-trend"></i>{% if k.change > 0 %}+{% endif %}{{ k.change }}% vs previous {{ span }} days</small>{% endif %}
+  </div>{% endfor %}
+</div>
+
+<section class="card" style="margin-bottom:1.2rem">
+  <h3>Activity over time</h3><p class="sub">Daily numbers for the last {{ span }} days. Move the mouse over the graph to see each day.</p>
+  <div class="chart" id="c-growth"></div>
+</section>
+
+<div class="charts">
+  <section class="card"><h3>Members per community</h3><p class="sub">Approved members, top 8</p><div class="chart" id="c-members"></div></section>
+  <section class="card"><h3>Listings by category</h3><p class="sub">All listings</p><div class="chart" id="c-categories"></div></section>
+  <section class="card"><h3>Sell vs lend</h3><p class="sub">What people post</p><div class="chart" id="c-types"></div></section>
+</div>
+
+<div class="charts">
+  <section class="card"><h3>Membership requests</h3><p class="sub">By decision</p><div class="chart" id="c-membership"></div></section>
+  <section class="card"><h3>Orders</h3><p class="sub">By status</p><div class="chart" id="c-orders"></div></section>
+  <section class="card"><h3>Borrow requests</h3><p class="sub">By status</p><div class="chart" id="c-borrow"></div></section>
+  <section class="card"><h3>Lost &amp; found</h3><p class="sub">Lost items vs found items</p><div class="chart" id="c-lostfound"></div></section>
+  <section class="card"><h3>Moderation reports</h3><p class="sub">Open vs resolved</p><div class="chart" id="c-reports"></div></section>
+</div>
+
+<div class="charts">
+  <section class="card"><h3>Most active communities</h3><p class="sub">Sorted by number of listings</p>
+    <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Community</th><th class="num">Members</th><th class="num">Listings</th><th class="num">Open lost &amp; found</th></tr></thead><tbody>
+    {% for c in activity %}<tr><td><a href="{% url 'manage_community' c.id %}" style="font-weight:600">{{ c.name }}</a></td><td class="num">{{ c.members }}</td><td class="num">{{ c.listings }}</td><td class="num">{{ c.lost }}</td></tr>
+    {% empty %}<tr><td colspan="4" class="muted">No communities yet.</td></tr>{% endfor %}</tbody></table></div></section>
+  <section class="card"><h3>Top sellers</h3><p class="sub">Members with the most listings</p>
+    <table class="tbl"><thead><tr><th>Member</th><th class="num">Listings</th></tr></thead><tbody>
+    {% for s in sellers %}<tr><td>{{ s.seller__username }}</td><td class="num">{{ s.n }}</td></tr>
+    {% empty %}<tr><td colspan="2" class="muted">No listings yet.</td></tr>{% endfor %}</tbody></table></section>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ charts|json_script:"chart-data" }}
+<script src="{% static 'home/js/charts.js' %}"></script>
+<script>
+(function(){
+  var d = HubCharts.data('chart-data');
+  function $(id){ return document.getElementById(id); }
+  function drawAll(){
+    HubCharts.line($('c-growth'), {labels: d.growth.labels, series: d.growth.series, height: 300, label: 'Daily activity'});
+  }
+  HubCharts.bars($('c-members'), d.members);
+  HubCharts.donut($('c-categories'), d.categories, 'listings');
+  HubCharts.donut($('c-types'), d.types, 'listings');
+  HubCharts.donut($('c-membership'), d.membership, 'requests');
+  HubCharts.bars($('c-orders'), d.orders);
+  HubCharts.bars($('c-borrow'), d.borrow);
+  HubCharts.donut($('c-lostfound'), d.lostfound, 'posts');
+  HubCharts.donut($('c-reports'), d.reports, 'reports');
+  drawAll(); var t; window.addEventListener('resize', function(){ clearTimeout(t); t = setTimeout(drawAll, 150); });
+})();
+</script>
+{% endblock %}

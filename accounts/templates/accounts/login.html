@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<div class="auth"><div class="card">
+  <h1 style="font-size:2rem">Welcome back</h1><p class="muted">Log in to reach your communities.</p>
+  {% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+  <form class="form" method="post">{% csrf_token %}<input type="hidden" name="next" value="{{ next }}">
+    <div class="field"><label for="username">Username</label><input id="username" name="username" autocomplete="username" required autofocus></div>
+    <div class="field"><label for="password">Password</label><input id="password" type="password" name="password" autocomplete="current-password" required></div>
+    <button class="btn btn-block" type="submit">Log in</button>
+  </form>
+  <p class="muted small" style="margin:1.2rem 0 0">New here? <a href="{% url 'register' %}" style="color:var(--brand-d);font-weight:600">Create an account</a></p>
+</div></div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Order #{{ order.id }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Order #{{ order.id }}</h1><p>{{ listing.title }} · {{ listing.community.name }}</p></div><span class="badge b-{{ order.status }} big-badge">{{ order.get_status_display }}</span></div>
+<div class="split">
+  <div class="card summary"><img class="cover" src="{{ listing.picture_url }}" alt="">
+    <h3>{{ listing.title }}</h3>
+    <p class="muted small">Seller: {{ listing.seller.username }} · Buyer: {{ order.buyer.username }}</p>
+    <div class="p-price big">₹{{ order.amount }}</div>
+    <p class="muted small">Paying by {{ order.get_method_display }}{% if order.upi_ref %} · Ref {{ order.upi_ref }}{% endif %}</p>
+    {% if order.note %}<p>“{{ order.note }}”</p>{% endif %}</div>
+  <div class="card">
+  {% if order.status == 'awaiting' and not is_seller %}
+    <h3>Pay with UPI</h3>
+    <p class="muted">Scan this QR in any UPI app, or tap the button on your phone. Pay exactly ₹{{ order.amount }}.</p>
+    <div class="qr">{{ qr|safe }}</div>
+    <p class="small"><b>UPI ID:</b> {{ seller_upi }}</p>
+    <a class="btn btn-ok btn-block" href="{{ upi_link }}">Open my UPI app</a>
+    <form class="form" method="post" action="{% url 'order_action' order.id %}" style="margin-top:1rem">{% csrf_token %}<input type="hidden" name="action" value="paid">
+      <div class="field"><label for="ref">After paying, enter the UPI reference / UTR number</label><input id="ref" name="upi_ref" required minlength="6" maxlength="40"></div>
+      <button class="btn btn-block" type="submit">I have paid</button></form>
+  {% elif order.status == 'awaiting' and is_seller %}
+    <h3>Waiting for the buyer to pay</h3><p class="muted">You will be notified when they send the payment reference.</p>
+  {% elif order.status == 'paid' and is_seller %}
+    <h3>{% if order.method == 'upi' %}Check your UPI app{% else %}Cash on meeting{% endif %}</h3>
+    <p class="muted">{% if order.method == 'upi' %}Confirm only after the money has really reached your account.{% else %}Confirm once you have met the buyer and received the cash.{% endif %}</p>
+    <form method="post" action="{% url 'order_action' order.id %}">{% csrf_token %}<button class="btn btn-ok btn-block" name="action" value="confirm">Confirm sale</button></form>
+  {% elif order.status == 'paid' %}
+    <h3>Waiting for the seller</h3><p class="muted">The seller will confirm and the item will be marked as sold.</p>
+  {% elif order.status == 'confirmed' %}
+    <h3>All done</h3><p class="muted">The sale is confirmed. Use chat to arrange pickup.</p>
+  {% else %}<h3>This order was cancelled</h3>{% endif %}
+  <div class="row" style="margin-top:1rem">
+    {% if order.status == 'awaiting' or order.status == 'paid' %}<form method="post" action="{% url 'order_action' order.id %}" onsubmit="return confirm('Cancel this order?')">{% csrf_token %}<button class="btn btn-sm btn-danger" name="action" value="cancel">Cancel order</button></form>{% endif %}
+    <a class="btn btn-sm btn-ghost" href="{% url 'my_orders' %}">All orders</a></div>
+  </div>
+</div>
+{% endblock %}

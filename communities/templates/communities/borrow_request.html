@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Borrow {{ listing.title }}<script>var u=document.getElementById('units'),e=document.getElementById('est');if(u)u.addEventListener('input',function(){e.textContent=(({{ listing.price|stringformat:'s' }})*(parseInt(u.value)||1)).toFixed(0);});</script>
+{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Request to borrow</h1><p>The owner gets a notification and decides.</p></div></div>
+<div class="card flat" style="max-width:640px;margin-bottom:1.2rem"><div class="meta"><span class="badge b-lend">Lend</span><span class="badge">{{ listing.community.name }}</span></div>
+  <h3 style="margin-top:.6rem">{{ listing.title }}</h3><p class="muted small" style="margin:0">Owner: {{ listing.seller.username }} · Rent {{ listing.price_label }}</p></div>
+{% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+{% if not error or request.method == 'POST' %}{% if listing.seller != request.user %}
+<form class="form card" method="post">{% csrf_token %}
+  <div class="field"><label for="return_date">Expected return date</label><input id="return_date" type="date" name="return_date" min="{{ min_date|date:'Y-m-d' }}" required></div>
+  <div class="field"><label for="units">How many {{ listing.get_rent_unit_display|cut:'per ' }}s?</label><input id="units" type="number" name="units" min="1" max="365" value="1" required>
+    <p class="hint">Estimated rent: <b>₹<span id="est">{{ listing.price }}</span></b>. Pay the owner directly when you collect it.</p></div>
+  <div class="field"><label for="message">Message to the owner (optional)</label><textarea id="message" name="message" placeholder="When do you need it, and what for?"></textarea></div>
+  <div class="row"><button class="btn" type="submit">Send request</button><a class="btn btn-ghost" href="{% url 'marketplace' listing.community.id %}">Cancel</a></div>
+</form>{% endif %}{% else %}
+<a class="btn btn-ghost" href="{% url 'marketplace' listing.community.id %}">Back to marketplace</a>{% endif %}
+<script>var u=document.getElementById('units'),e=document.getElementById('est');if(u)u.addEventListener('input',function(){e.textContent=(({{ listing.price|stringformat:'s' }})*(parseInt(u.value)||1)).toFixed(0);});</script>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}My dashboard{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Hi, {{ user.username }}</h1><p>Your communities and everything waiting for you.</p></div>
+  <a class="btn" href="{% url 'community_list' %}">Explore communities</a></div>
+<div class="kpis">
+  <a class="kpi c1" href="{% url 'my_listings' %}" style="text-decoration:none"><b>{{ my_active_listings }}</b><span>My active listings</span></a>
+  <a class="kpi c2" href="{% url 'borrow_requests' %}" style="text-decoration:none"><b>{{ incoming_pending }}</b><span>Requests to answer</span></a>
+  <div class="kpi c4"><b>{{ my_borrowing }}</b><span>Items I'm borrowing</span></div>
+  <div class="kpi c6"><b>{{ my_open_posts }}</b><span>My open lost &amp; found posts</span></div>
+  <a class="kpi c3" href="{% url 'notification_list' %}" style="text-decoration:none"><b>{{ unread_count|default:0 }}</b><span>Unread notifications</span></a>
+</div>
+<h2>My communities</h2>
+<div class="grid" style="margin-bottom:2rem">
+{% for m in memberships %}
+  <article class="card tilt"><img class="cover" src="{{ m.community.cover_url }}" alt="">
+    <div class="meta" style="margin-bottom:.6rem"><span class="badge">{{ m.community.get_community_type_display }}</span><span class="badge b-{{ m.status }}">{{ m.get_status_display }}</span>{% if m.role == 'moderator' %}<span class="badge b-pinned">Moderator</span>{% endif %}</div>
+    <h3>{{ m.community.name }}</h3><p class="muted small"><i class="ic ic-pin"></i> {{ m.community.location }}</p>
+    {% if m.status == 'approved' %}<a class="btn btn-sm" href="{% url 'community_detail' m.community.id %}">Open</a>{% elif m.status == 'pending' %}<span class="muted small">Waiting for approval</span>{% else %}<span class="muted small">Request was rejected</span>{% endif %}
+  </article>
+{% empty %}<div class="empty"><span class="big"><i class="ic ic-home"></i></span><h3>You haven't joined a community yet</h3><p>Find your college, hostel or neighbourhood, or ask the admins to add it.</p><a class="btn" href="{% url 'community_list' %}">Find a community</a></div>{% endfor %}
+</div>
+{% if my_requests %}<h2>My community requests</h2><div class="stack-v">{% for r in my_requests %}
+  <div class="card flat item"><div><b>{{ r.name }}</b> <span class="muted small">· {{ r.location }}</span></div><span class="badge b-{{ r.status }}">{{ r.get_status_display }}</span></div>{% endfor %}</div>{% endif %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Communities{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Communities</h1><p>Every community on the platform. Open one to approve members, review reports and post notices.</p></div>
+  <a class="btn" href="/admin/communities/community/add/"><i class="ic ic-plus"></i>New community</a>
+</div>
+<form class="search row" method="get" style="margin-bottom:1.4rem">
+  <input type="text" name="search" value="{{ search }}" placeholder="Search by name or location">
+  <button class="btn" type="submit">Search</button>
+</form>
+<section class="card" style="padding:.6rem 1rem 1rem">
+  <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Community</th><th>Type</th><th>Location</th><th class="num">Members</th><th class="num">Pending</th><th class="num">Listings</th><th class="num">Open L&amp;F</th><th></th></tr></thead><tbody>
+  {% for c in communities %}<tr>
+    <td><b>{{ c.name }}</b></td><td><span class="badge">{{ c.get_community_type_display }}</span></td><td class="muted">{{ c.location }}</td>
+    <td class="num">{{ c.members }}</td><td class="num">{% if c.pending %}<span class="badge b-pending">{{ c.pending }}</span>{% else %}0{% endif %}</td><td class="num">{{ c.listings }}</td><td class="num">{{ c.open_lf }}</td>
+    <td style="text-align:right;white-space:nowrap"><a class="btn btn-sm" href="{% url 'manage_community' c.id %}">Manage</a> <a class="btn btn-sm btn-ghost" href="/admin/communities/community/{{ c.id }}/change/">Edit</a></td></tr>
+  {% empty %}<tr><td colspan="8" class="muted" style="padding:1.5rem">{% if search %}Nothing matches “{{ search }}”.{% else %}No communities yet. Use “New community” to add the first one.{% endif %}</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

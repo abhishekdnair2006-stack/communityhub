@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Post notice{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{% if manager %}Post a notice{% else %}Post to the noticeboard{% endif %}</h1><p>{{ community.name }}. {% if manager %}All approved members will be notified.{% else %}Report a problem, ask for help or share something with your neighbours. Moderators are notified.{% endif %}</p></div></div>
+{% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+<form class="form card" method="post">{% csrf_token %}
+  <div class="field"><label for="title">Title</label><input id="title" name="title" value="{{ v.title|default:'' }}" required></div>
+  <div class="field"><label for="content">Notice</label><textarea id="content" name="content" required>{{ v.content|default:'' }}</textarea></div>
+  <div class="field"><label for="notice_type">Type</label><select id="notice_type" name="notice_type">{% for key, label in types %}<option value="{{ key }}" {% if v.notice_type == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  {% if manager %}<label class="check"><input type="checkbox" name="is_pinned" {% if v.is_pinned %}checked{% endif %}> Pin to the top of the noticeboard</label>{% endif %}
+  <div class="row"><button class="btn" type="submit">Publish notice</button><a class="btn btn-ghost" href="{% url 'notice_list' community.id %}">Cancel</a></div>
+</form>
+{% endblock %}

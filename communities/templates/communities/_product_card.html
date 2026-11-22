@@ -1,0 +1,25 @@
+<article class="product">
+  <a class="p-img" href="{% if item.listing_type == 'sell' %}{% url 'buy_item' item.id %}{% else %}{% url 'borrow_item' item.id %}{% endif %}"><img src="{{ item.picture_url }}" alt="{{ item.title }}" loading="lazy">
+    <span class="badge b-{{ item.listing_type }} corner">{% if item.listing_type == 'lend' %}Rent{% else %}Buy{% endif %}</span></a>
+  <div class="p-body">
+    <p class="p-meta">{{ item.get_category_display }}{% if show_community %} · {{ item.community.name }}{% endif %}</p>
+    <h3>{{ item.title }}</h3>
+    <div class="p-price">{{ item.price_label }}</div>
+    <p class="muted small">{{ item.seller.username }} · {{ item.created_at|date:"d M" }}</p>
+    {% if item.seller == request.user %}
+      <a class="btn btn-sm btn-ghost btn-block" href="{% url 'edit_listing' item.id %}">Edit your listing</a>
+    {% else %}
+      <div class="row">
+        {% if item.listing_type == 'sell' %}<a class="btn btn-sm" href="{% url 'buy_item' item.id %}">Buy now</a>
+        {% else %}<a class="btn btn-sm" href="{% url 'borrow_item' item.id %}">Rent</a>{% endif %}
+        <details class="msg"><summary class="btn btn-sm btn-ghost">Message</summary>
+          <form method="post" action="{% url 'start_chat' item.id %}">{% csrf_token %}
+            <textarea name="body" placeholder="Hi, is this still available?" required maxlength="1000"></textarea>
+            <button class="btn btn-sm" type="submit">Send</button></form></details>
+      </div>
+      <details class="report"><summary>Report</summary>
+        <form method="post" action="{% url 'report_content' 'listing' item.id %}">{% csrf_token %}
+          <textarea name="reason" placeholder="What is wrong with this listing?" required></textarea><button class="btn btn-sm btn-danger">Send report</button></form></details>
+    {% endif %}
+  </div>
+</article>

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Buy {{ listing.title }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Checkout</h1><p>Pay the seller directly. CommunityHub never holds your money.</p></div></div>
+<div class="split">
+  <div class="card summary"><img class="cover" src="{{ listing.picture_url }}" alt="">
+    <h3>{{ listing.title }}</h3><p class="muted small">Sold by {{ listing.seller.username }} · {{ listing.community.name }}</p>
+    <div class="p-price big">{{ listing.price_label }}</div></div>
+  <form class="form card" method="post">{% csrf_token %}
+    {% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+    <div class="field"><label>Payment method</label>
+      <label class="check"><input type="radio" name="method" value="upi" checked> Pay by UPI (GPay, PhonePe, Paytm)</label>
+      <label class="check"><input type="radio" name="method" value="cash"> Cash when we meet</label>
+      {% if not seller_upi %}<p class="hint">This seller has not added a UPI ID, so cash is the only option.</p>{% endif %}</div>
+    <div class="field"><label for="note">Note to the seller (optional)</label><textarea id="note" name="note" placeholder="Where and when can we meet?"></textarea></div>
+    <div class="row"><button class="btn" type="submit">Place order</button><a class="btn btn-ghost" href="{% url 'shop' %}">Cancel</a></div>
+  </form>
+</div>
+{% endblock %}

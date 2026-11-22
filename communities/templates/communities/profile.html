@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Edit profile{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Edit profile</h1><p>Your photo and name show in the top right menu. Your phone number stays private until you choose to share it in a chat.</p></div></div>
+{% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+<form class="form card" method="post" enctype="multipart/form-data" style="max-width:720px">{% csrf_token %}
+  <div class="avatar-edit">
+    <span class="avatar xl" id="avatar-preview">{% if profile.avatar %}<img src="{{ profile.avatar_url }}" alt="">{% else %}{{ nav_initial }}{% endif %}</span>
+    <div>
+      <b style="color:var(--ink)">Profile picture</b>
+      <p class="muted small" style="margin:.15rem 0 .6rem">JPG or PNG, up to 5 MB. We crop it to a square.</p>
+      <label class="btn btn-sm btn-ghost" for="avatar" style="cursor:pointer"><i class="ic ic-camera"></i>Choose photo</label>
+      <input id="avatar" type="file" name="avatar" accept="image/*" data-preview="#avatar-preview">
+      {% if profile.avatar %}<label class="check"><input type="checkbox" name="remove_avatar" value="1"> Remove my current photo</label>{% endif %}
+    </div>
+  </div>
+  <div class="two">
+    <div class="field"><label for="first_name">First name</label><input id="first_name" name="first_name" value="{{ user.first_name }}" autocomplete="given-name"></div>
+    <div class="field"><label for="last_name">Last name</label><input id="last_name" name="last_name" value="{{ user.last_name }}" autocomplete="family-name"></div>
+  </div>
+  <div class="field"><label for="email">Email</label><input id="email" type="email" name="email" value="{{ user.email }}" autocomplete="email"></div>
+  <div class="field"><label for="phone">WhatsApp / phone number</label><input id="phone" name="phone" value="{{ profile.phone }}" placeholder="9876543210" inputmode="numeric"></div>
+  <div class="field"><label for="upi">Your UPI ID (to receive payments)</label><input id="upi" name="upi_id" value="{{ profile.upi_id }}" placeholder="yourname@okhdfcbank">
+    <p class="hint">Buyers will see a QR code made from this ID. Only add the ID of an account you control.</p></div>
+  <div class="row"><button class="btn" type="submit">Save changes</button><a class="btn btn-ghost" href="{% if user.is_staff %}{% url 'admin_dashboard' %}{% else %}{% url 'shop' %}{% endif %}">Cancel</a></div>
+</form>
+{% endblock %}
